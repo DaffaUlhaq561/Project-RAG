@@ -1,0 +1,169 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "802b15cf-e465-4616-9600-6ef74f36060d",
+      "name": "Telegram Trigger",
+      "webhookId": "84f3803a-f7e6-4ca4-83b1-1c0ac5c68aaf",
+      "credentials": {
+        "telegramApi": {
+          "id": "FddXFF1Xg5fIGjNp",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "Kamu adalah AI assistant yang menjawab pesan dari Telegram. Berikan jawaban alami, singkat, dan membantu.\n\nKamu adalah AI Agent untuk Telegram. Tugasmu adalah:\n- menjawab sesuai konteks pengguna\n- lakukan reasoning jika perlu\n- gunakan tools jika dibutuhkan\n- tetap singkat dan tidak overthinking\n- boleh menggunakan bahasa gaul atau formal sesuai pesan user"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "246b33a8-6a76-410e-8ae7-69100dd08509",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        224
+      ],
+      "id": "c8e5185a-4b87-4834-b1a4-0e66198efb99",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "a580c02f-6eab-4c51-902d-eb2e8bd07d15",
+      "name": "Send a text message",
+      "webhookId": "c0137675-fb8a-4035-9acd-b21aebb53371",
+      "credentials": {
+        "telegramApi": {
+          "id": "FddXFF1Xg5fIGjNp",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        192
+      ],
+      "id": "6a286cd4-521c-4cc0-ad3f-d899e926088d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ErUpwJxqD99EmZC7",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "saveDataErrorExecution": "none",
+    "saveDataSuccessExecution": "none",
+    "errorWorkflow": "kT2bOemUFBXEzrqG",
+    "timeSavedPerExecution": 2
+  },
+  "versionId": "a0ce17b7-d9ad-4fe0-86e4-e6702d6562f2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "807464864fa6b8f46e2e1a77b8ec00614a4c68b7b9ef24f2c46d1c538f37a9f5"
+  },
+  "id": "kT2bOemUFBXEzrqG",
+  "tags": []
+}
