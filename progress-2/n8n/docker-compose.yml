@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - GENERIC_TIMEZONE=Asia/Jakarta
+      - N8N_USER_MANAGEMENT_DISABLED=false
+      - N8N_ADMIN_EMAIL=daffaulhaq5656@gmail.com
+      - N8N_ADMIN_PASSWORD=admin561
+      # - WEBHOOK_URL=https://retributive-dorian-frightenedly.ngrok-free.dev
+      # - N8N_WEBHOOK_TUNNEL_URL=https://retributive-dorian-frightenedly.ngrok-free.dev
+    volumes:
+      - ./n8n_data:/home/node/.n8n  # Untuk lihat dashboard ngrok
+volumes:
+  n8n_data:
