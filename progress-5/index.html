@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project RAG Chatbot – AI Assistant</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --muted: #cbd5e1;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border: #334155;
+            --user-msg: #3b82f6;
+            --assistant-msg: #1e293b;
+        }
+        * { box-sizing: border-box }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 16px;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            max-height: 700px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        .title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .subtitle {
+            margin: 6px 0 0 0;
+            color: rgba(255,255,255,.8);
+            font-size: 13px;
+        }
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: slideIn .3s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .message.user {
+            justify-content: flex-end;
+        }
+        .message.assistant {
+            justify-content: flex-start;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .message.user .avatar {
+            background: var(--user-msg);
+            order: 2;
+        }
+        .message.assistant .avatar {
+            background: #10b981;
+        }
+        .bubble {
+            max-width: 60%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .message.user .bubble {
+            background: var(--user-msg);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .message.assistant .bubble {
+            background: #334155;
+            color: var(--muted);
+            border-bottom-left-radius: 4px;
+        }
+        .input-area {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            background: var(--card);
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #0f172a;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,.2);
+        }
+        input[type="text"]::placeholder {
+            color: #64748b;
+        }
+        .btn {
+            appearance: none;
+            border: none;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s ease, transform .02s ease;
+            flex-shrink: 0;
+        }
+        .btn:hover { background: var(--primary-hover) }
+        .btn:active { transform: translateY(1px) }
+        .btn:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            opacity: .6;
+        }
+        .loading {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .loading span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #2563eb;
+            animation: pulse 1.4s infinite;
+        }
+        .loading span:nth-child(2) { animation-delay: .2s }
+        .loading span:nth-child(3) { animation-delay: .4s }
+        @keyframes pulse {
+            0%, 100% { opacity: .3 }
+            50% { opacity: 1 }
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="header">
+            <h1 class="title">🤖 AI Assistant</h1>
+            <p class="subtitle">Chat dengan AI yang menggunakan teknologi RAG (Retrieval-Augmented Generation)</p>
+        </div>
+        <div class="chat-area" id="chatArea">
+            <div class="message assistant">
+                <div class="avatar">🤖</div>
+                <div class="bubble">Halo! Saya adalah asisten AI yang siap membantu Anda. Silakan tanyakan pertanyaan apapun tentang dokumen yang telah diindeks.</div>
+            </div>
+        </div>
+        <div class="input-area">
+            <input 
+                type="text" 
+                id="questionInput" 
+                placeholder="Tulis pertanyaanmu di sini..." 
+                autocomplete="off"
+            >
+            <button class="btn" id="sendBtn" onclick="sendMessage()">Kirim</button>
+        </div>
+    </main>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const questionInput = document.getElementById('questionInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function scrollToBottom() {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function addMessage(text, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = isUser ? '👤' : '🤖';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(bubble);
+            chatArea.appendChild(messageDiv);
+            
+            scrollToBottom();
+        }
+
+        function showLoading() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            messageDiv.id = 'loadingMsg';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = '🤖';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble loading';
+            bubble.innerHTML = '<span></span><span></span><span></span>';
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(bubble);
+            chatArea.appendChild(messageDiv);
+            
+            scrollToBottom();
+        }
+
+        async function sendMessage() {
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            // Add user message
+            addMessage(question, true);
+            questionInput.value = '';
+            sendBtn.disabled = true;
+
+            // Show loading
+            showLoading();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+                
+                // Remove loading message
+                const loadingMsg = document.getElementById('loadingMsg');
+                if (loadingMsg) loadingMsg.remove();
+
+                if (response.ok) {
+                    addMessage(data.answer, false);
+                } else {
+                    addMessage('Maaf, terjadi kesalahan. Silakan coba lagi.', false);
+                }
+            } catch (error) {
+                // Remove loading message
+                const loadingMsg = document.getElementById('loadingMsg');
+                if (loadingMsg) loadingMsg.remove();
+
+                addMessage('Maaf, terjadi kesalahan koneksi. Silakan coba lagi.', false);
+                console.error('Error:', error);
+            } finally {
+                sendBtn.disabled = false;
+                questionInput.focus();
+            }
+        }
+
+        // Send message on Enter key
+        questionInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Focus input on load
+        window.addEventListener('load', () => {
+            questionInput.focus();
+            scrollToBottom();
+        });
+    </script>
+</body>
+</html>

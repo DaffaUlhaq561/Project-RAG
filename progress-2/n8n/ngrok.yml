@@ -1,6 +1,6 @@
 version: "3"
 agent:
-  authtoken: 35gueloA5RsTL8ImhyvgwoHeaUR_5E1LXjSRRV3yf3TpgbrGa
+  authtoken: 36gi0xXhuaEQQaCMwEwBDuTf2Sl_3tRPJmqcqezBJyMg8xiXE
 
 endpoints:
   - name: n8n

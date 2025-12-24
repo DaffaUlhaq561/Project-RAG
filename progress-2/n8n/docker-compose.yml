@@ -14,8 +14,8 @@ services:
       - N8N_USER_MANAGEMENT_DISABLED=false
       - N8N_ADMIN_EMAIL=daffaulhaq5656@gmail.com
       - N8N_ADMIN_PASSWORD=admin561
-      # - WEBHOOK_URL=https://retributive-dorian-frightenedly.ngrok-free.dev
-      # - N8N_WEBHOOK_TUNNEL_URL=https://retributive-dorian-frightenedly.ngrok-free.dev
+      - WEBHOOK_URL=https://joette-undefensed-illatively.ngrok-free.dev
+      - N8N_WEBHOOK_TUNNEL_URL=https://joette-undefensed-illatively.ngrok-free.dev
     volumes:
       - ./n8n_data:/home/node/.n8n  # Untuk lihat dashboard ngrok
 volumes:
