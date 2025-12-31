@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/api/chat", async (req, res) => {
-    const webhookUrl = "https://joette-undefensed-illatively.ngrok-free.dev/webhook-test/96d331f8-c02e-4fd1-ad6d-4e9d3f081a82"
+    const webhookUrl = "https://n8n.daffaulhq.online/webhook-test/96d331f8-c02e-4fd1-ad6d-4e9d3f081a82"
     // Alternative: const webhookUrl = "http://localhost:5678/webhook/96d331f8-c02e-4fd1-ad6d-4e9d3f081a82"; 
     const question = req.body.question;
 
